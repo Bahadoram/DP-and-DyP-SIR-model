@@ -6,6 +6,25 @@ def normalize_probs(inf_prob, rec_prob):
 def infection_rate(rec_rate, ratio, n, d): #for the old algorithm 
     return(rec_rate* ratio * (n/(2*d)))
 
+def normalize_timegrid(N, timesteps, Y):
+    #let's take fix_interval, as prof said, the 1/N
+    fixed_interval = 1/N
+    fix_grid = [i* fixed_interval for i in np.arange(int((timesteps[-1])/(fixed_interval)))]
+    fix_Y    = []
+    for val in fix_grid:
+        closest_time = min(timesteps, key=lambda x:abs(x-val))
+        closest_inx  = np.where(timesteps== closest_time)[0][0]
+        fix_Y.append(Y[closest_inx])
+    return(fix_Y, fix_grid)
+
+def scaling_timegrid(epoch_list):
+    interval = np.array([1/i if i!=0 else 1 for i in epoch_list])
+    timesteps = []
+    for i in range(len(interval)):
+        if i ==0: timesteps.append(interval[i])
+        else: timesteps.append(interval[i] + timesteps[i-1])
+    return(timesteps)
+
 def update_conf(conf, ratio,  d, rec_list, p_2):
     if d==1:
         try:
